@@ -91,7 +91,8 @@ NSString * const kAFOauthRefreshGrantType = @"refresh_token";
     
     [self postPath:path parameters:parameters success:^ (AFHTTPRequestOperation *operation, id responseObject) {
         AFOauthAccountCredential *credential = [AFOauthAccountCredential credentialWithOAuthToken:[responseObject valueForKey:@"access_token"] tokenSecret:[parameters valueForKey:@"client_secret"]];
-        [credential setRefreshToken:[responseObject valueForKey:@"refresh_token"] expiration:[NSDate dateWithTimeIntervalSinceNow:[[responseObject valueForKey:@"expires_in"] integerValue]]];
+        if ([responseObject valueForKey:@"expires_in"] != [NSNull null])
+            [credential setRefreshToken:[responseObject valueForKey:@"refresh_token"] expiration:[NSDate dateWithTimeIntervalSinceNow:[[responseObject valueForKey:@"expires_in"] integerValue]]];
         AFOAuthAccount *account = [AFOAuthAccount accountWithUsername:[responseObject valueForKey:@"username"] serviceProviderIdentifier:self.serviceProviderIdentifier credential:credential];
         
         if ([credential isExpired]) {
